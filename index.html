@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedGuide — Smart Medication Reminder</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="patient-display">
+  <!-- Wristband simulation indicator (always visible when active) -->
+  <div id="wristband-indicator" class="wristband-indicator hidden" aria-live="polite">
+    <span class="wristband-icon" aria-hidden="true">⌚</span>
+    <span>Wristband vibrating</span>
+  </div>
+
+  <!-- Patient ID badge (minimal PII) -->
+  <div id="patient-badge" class="patient-badge hidden">
+    <span class="label">Patient ID</span>
+    <span id="patient-id-value">—</span>
+  </div>
+
+  <main id="app" role="main">
+    <!-- HOME SCREEN -->
+    <section id="screen-home" class="screen active" aria-labelledby="home-title">
+      <div class="screen-content">
+        <h1 id="home-title" class="title">MedGuide</h1>
+        <p class="subtitle">Your medication helper</p>
+        <div class="clock-block">
+          <div id="home-time" class="big-time" aria-live="polite">—:—</div>
+          <div id="home-date" class="big-date" aria-live="polite">—</div>
+        </div>
+        <p class="hint">When it’s time for your medicine, your wristband will vibrate and this screen will show your next step.</p>
+        <div class="medication-station-hint">
+          <span class="icon-station" aria-hidden="true">📦</span>
+          <span>Medicine is stored in the box next to this screen.</span>
+        </div>
+        <p class="demo-hint">For demo: <button type="button" id="demo-trigger" class="demo-link">Start medication reminder</button></p>
+      </div>
+    </section>
+
+    <!-- MEDICATION REMINDER ALERT -->
+    <section id="screen-reminder" class="screen" aria-labelledby="reminder-title" hidden>
+      <div class="screen-content">
+        <div class="alert-badge" role="alert">Time for your medicine</div>
+        <h2 id="reminder-title" class="title">Medication reminder</h2>
+        <div class="clock-block">
+          <div id="reminder-time" class="big-time" aria-live="polite">—:—</div>
+          <div id="reminder-date" class="big-date" aria-live="polite">—</div>
+        </div>
+        <p class="instruction-lead">Please come to the screen to see your instructions.</p>
+        <button id="btn-ack-reminder" class="btn btn-primary btn-large" type="button">
+          I’m here — show my instructions
+        </button>
+        <p class="wristband-hint">Your wristband will keep vibrating until you start.</p>
+      </div>
+    </section>
+
+    <!-- MEDICATION INSTRUCTIONS SCREEN -->
+    <section id="screen-instructions" class="screen" aria-labelledby="instructions-title" hidden>
+      <div class="screen-content">
+        <div class="progress-steps" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" aria-label="Medication steps">
+          <span class="step active" data-step="1">1</span>
+          <span class="step" data-step="2">2</span>
+          <span class="step" data-step="3">3</span>
+          <span class="step" data-step="4">4</span>
+        </div>
+        <h2 id="instructions-title" class="title">Step 1 — Your medicine</h2>
+        <div class="medication-card">
+          <p class="med-name" id="instruction-med-name">—</p>
+          <p class="med-dosage" id="instruction-dosage">—</p>
+          <p class="med-time" id="instruction-time">—</p>
+        </div>
+        <div class="instruction-panel">
+          <p class="voice-indicator" aria-hidden="true">🔊 Voice guidance on</p>
+          <ol class="steps-list" id="instructions-list">
+            <li>Go to the medication box next to this screen.</li>
+            <li>Take <strong id="instruction-dose-text">one pill</strong> from the correct bottle.</li>
+            <li>Take the medicine with a full glass of water.</li>
+            <li>Come back and stand in front of the camera to confirm.</li>
+          </ol>
+        </div>
+        <div class="medication-station-visual">
+          <span class="icon-station" aria-hidden="true">📦</span>
+          <p>Medicine box is here →</p>
+        </div>
+        <button id="btn-ready-camera" class="btn btn-primary btn-large" type="button">
+          I’ve taken it — confirm at camera
+        </button>
+        <p class="demo-hint"><button type="button" id="demo-walk-away" class="demo-link">Demo: Simulate walked away</button></p>
+      </div>
+    </section>
+
+    <!-- CAMERA VERIFICATION SCREEN -->
+    <section id="screen-camera" class="screen" aria-labelledby="camera-title" hidden>
+      <div class="screen-content">
+        <div class="progress-steps" role="progressbar" aria-valuenow="2" aria-valuemin="1" aria-valuemax="4">
+          <span class="step done" data-step="1">1</span>
+          <span class="step active" data-step="2">2</span>
+          <span class="step" data-step="3">3</span>
+          <span class="step" data-step="4">4</span>
+        </div>
+        <h2 id="camera-title" class="title">Stand in front of the camera</h2>
+        <div class="camera-frame" id="camera-frame">
+          <div class="camera-placeholder">
+            <span class="camera-icon" aria-hidden="true">📷</span>
+            <p>Stand here so we can confirm you’re ready.</p>
+          </div>
+          <div id="camera-verified" class="camera-verified hidden">
+            <span class="check-icon" aria-hidden="true">✓</span>
+            <p>Verified</p>
+          </div>
+        </div>
+        <p class="instruction-lead">Then put the medicine bottle back in the box.</p>
+        <div class="medication-station-visual">
+          <span class="icon-station" aria-hidden="true">📦</span>
+          <p>Put medicine back here ←</p>
+        </div>
+        <button id="btn-complete" class="btn btn-primary btn-large" type="button">
+          I’ve put it back — I’m done
+        </button>
+      </div>
+    </section>
+
+    <!-- COMPLETION CONFIRMATION SCREEN -->
+    <section id="screen-complete" class="screen" aria-labelledby="complete-title" hidden>
+      <div class="screen-content completion-content">
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <h2 id="complete-title" class="title">All done</h2>
+        <p class="confirmation-text">Your medication has been recorded. Well done.</p>
+        <p class="next-hint" id="next-med-hint">Your next reminder will appear at the scheduled time.</p>
+        <div class="clock-block">
+          <div id="complete-time" class="big-time" aria-live="polite">—:—</div>
+        </div>
+        <button id="btn-back-home" class="btn btn-secondary btn-large" type="button">
+          Back to home
+        </button>
+      </div>
+    </section>
+
+    <!-- INCOMPLETE TASK REMINDER SCREEN -->
+    <section id="screen-incomplete" class="screen screen-incomplete" aria-labelledby="incomplete-title" hidden>
+      <div class="screen-content">
+        <div class="alert-badge alert-urgent" role="alert">Please complete your medicine</div>
+        <h2 id="incomplete-title" class="title">You left before finishing</h2>
+        <p class="instruction-lead">Your wristband will keep vibrating. Please come back and finish your medication.</p>
+        <div class="reminder-sound-hint">
+          <span class="icon-sound" aria-hidden="true">🔔</span>
+          <span>Reminder sound playing</span>
+        </div>
+        <div class="medication-card compact">
+          <p class="med-name" id="incomplete-med-name">—</p>
+          <p class="med-dosage" id="incomplete-dosage">—</p>
+        </div>
+        <button id="btn-resume" class="btn btn-primary btn-large" type="button">
+          I’m back — continue
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

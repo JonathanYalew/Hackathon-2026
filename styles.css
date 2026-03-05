@@ -1,0 +1,629 @@
+/* ============================================
+   MedGuide — Smart Medication Reminder
+   Dementia-friendly, high-contrast, accessible
+   ============================================ */
+
+:root {
+  /* High contrast, calm palette */
+  --bg: #f5f7fa;
+  --bg-card: #ffffff;
+  --text: #1a1a2e;
+  --text-soft: #4a4a6a;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #059669;
+  --success-bg: #d1fae5;
+  --alert: #d97706;
+  --alert-bg: #fef3c7;
+  --urgent: #dc2626;
+  --urgent-bg: #fee2e2;
+  --border: #e2e8f0;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  /* Typography — large for cognitive ease */
+  --font: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-base: 1.5rem;      /* 24px */
+  --text-lg: 1.875rem;      /* 30px */
+  --text-xl: 2.25rem;       /* 36px */
+  --text-2xl: 3rem;         /* 48px */
+  --text-3xl: 4rem;         /* 64px */
+  --text-4xl: 5rem;         /* 80px */
+
+  --radius: 16px;
+  --radius-lg: 24px;
+  --space: 1.5rem;
+  --space-lg: 2.5rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.patient-display {
+  max-width: 900px;
+  width: 100%;
+}
+
+/* --- Global screen layout --- */
+.screen {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+.screen[hidden] {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.screen-content {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow);
+  border: 3px solid var(--border);
+}
+
+/* --- Typography --- */
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  margin: 0 0 var(--space);
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-soft);
+  margin: 0 0 var(--space-lg);
+}
+
+.big-time {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.big-date {
+  font-size: var(--text-xl);
+  color: var(--text-soft);
+  margin: 0.25rem 0 var(--space-lg);
+}
+
+/* --- Wristband indicator --- */
+.wristband-indicator {
+  position: fixed;
+  top: var(--space);
+  right: var(--space);
+  background: var(--alert-bg);
+  color: var(--alert);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 3px solid var(--alert);
+  z-index: 100;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.wristband-indicator.hidden {
+  display: none !important;
+}
+
+.wristband-icon {
+  font-size: 1.5rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
+}
+
+/* --- Patient badge (minimal PII) --- */
+.patient-badge {
+  position: fixed;
+  top: var(--space);
+  left: var(--space);
+  background: var(--bg-card);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: var(--text-base);
+  border: 2px solid var(--border);
+  z-index: 100;
+}
+
+.patient-badge .label {
+  color: var(--text-soft);
+  margin-right: 0.5rem;
+}
+
+.patient-badge.hidden {
+  display: none !important;
+}
+
+/* --- Buttons --- */
+.btn {
+  font-family: var(--font);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: var(--space);
+  min-height: 72px;
+}
+
+.btn:focus {
+  outline: 4px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  max-width: 420px;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.btn-large {
+  font-size: var(--text-xl);
+  padding: 1.25rem 2rem;
+}
+
+/* --- Alert badges --- */
+.alert-badge {
+  display: inline-block;
+  background: var(--alert-bg);
+  color: var(--alert);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  margin-bottom: var(--space);
+  border: 3px solid var(--alert);
+}
+
+.alert-urgent {
+  background: var(--urgent-bg);
+  color: var(--urgent);
+  border-color: var(--urgent);
+}
+
+/* --- Clock block --- */
+.clock-block {
+  margin: var(--space) 0;
+}
+
+/* --- Medication card --- */
+.medication-card {
+  background: var(--bg);
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin: var(--space) 0;
+}
+
+.medication-card.compact {
+  padding: var(--space);
+}
+
+.med-name {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 0.25rem;
+}
+
+.med-dosage {
+  font-size: var(--text-xl);
+  color: var(--primary);
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.med-time {
+  font-size: var(--text-lg);
+  color: var(--text-soft);
+  margin: 0;
+}
+
+/* --- Progress steps --- */
+.progress-steps {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.progress-steps .step {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-soft);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+}
+
+.progress-steps .step.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary-dark);
+}
+
+.progress-steps .step.done {
+  background: var(--success);
+  color: white;
+}
+
+/* --- Instruction panel --- */
+.instruction-panel {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin: var(--space) 0;
+  border: 2px solid var(--border);
+}
+
+.voice-indicator {
+  font-size: var(--text-lg);
+  color: var(--text-soft);
+  margin: 0 0 var(--space);
+}
+
+.steps-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+
+.steps-list li {
+  margin-bottom: 0.75rem;
+}
+
+/* --- Medication station visual --- */
+.medication-station-hint,
+.medication-station-visual {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: var(--space) 0;
+  padding: 1rem;
+  background: var(--bg);
+  border-radius: var(--radius);
+  font-size: var(--text-lg);
+}
+
+.icon-station {
+  font-size: 2.5rem;
+}
+
+/* --- Camera frame (simulated) --- */
+.camera-frame {
+  position: relative;
+  background: #1a1a2e;
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  margin: var(--space) 0;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--border);
+}
+
+.camera-placeholder {
+  text-align: center;
+  color: #94a3b8;
+  font-size: var(--text-lg);
+}
+
+.camera-placeholder p {
+  margin: 0.5rem 0 0;
+}
+
+.camera-icon {
+  font-size: 4rem;
+  display: block;
+}
+
+.camera-verified {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 150, 105, 0.9);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+
+.camera-verified.hidden {
+  display: none !important;
+}
+
+.camera-verified .check-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Completion screen --- */
+.completion-content {
+  text-align: center;
+}
+
+.success-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--success);
+  color: white;
+  font-size: 4rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space);
+}
+
+.confirmation-text {
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space);
+}
+
+.next-hint {
+  font-size: var(--text-lg);
+  color: var(--text-soft);
+  margin: 0 0 var(--space-lg);
+}
+
+/* --- Incomplete / reminder sound --- */
+.reminder-sound-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--urgent-bg);
+  color: var(--urgent);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin: var(--space) 0;
+  border: 3px solid var(--urgent);
+}
+
+.icon-sound {
+  font-size: 2rem;
+}
+
+.instruction-lead {
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space);
+}
+
+.hint,
+.wristband-hint {
+  font-size: var(--text-lg);
+  color: var(--text-soft);
+  margin: var(--space) 0 0;
+}
+
+.demo-hint {
+  font-size: var(--text-base);
+  color: var(--text-soft);
+  margin: var(--space-lg) 0 0;
+}
+
+.demo-link {
+  font-family: var(--font);
+  font-size: inherit;
+  font-weight: 700;
+  background: none;
+  border: none;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.demo-link:hover {
+  color: var(--primary-dark);
+}
+
+/* --- Caregiver dashboard (separate page) --- */
+.dashboard body {
+  align-items: flex-start;
+  padding: var(--space);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: var(--space-lg);
+}
+
+.dashboard-header .title {
+  font-size: var(--text-2xl);
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-header .subtitle {
+  margin-bottom: var(--space);
+}
+
+.dashboard .screen-content {
+  max-width: 100%;
+}
+
+.dashboard-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.dashboard-nav a {
+  font-size: var(--text-base);
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  background: var(--border);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav a.active {
+  background: var(--primary);
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.dashboard section,
+.dashboard-section {
+  margin-bottom: var(--space-lg);
+}
+
+.dashboard .form-actions {
+  margin-top: var(--space);
+}
+
+.missed-alerts {
+  margin-bottom: var(--space);
+}
+
+.dashboard h2 {
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space);
+}
+
+.dashboard table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-base);
+}
+
+.dashboard th,
+.dashboard td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.dashboard th {
+  font-weight: 800;
+  background: var(--bg);
+}
+
+.dashboard .status-ok {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.dashboard .status-missed {
+  color: var(--urgent);
+  font-weight: 700;
+}
+
+.dashboard .card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: var(--space);
+  border: 2px solid var(--border);
+}
+
+.dashboard .form-group {
+  margin-bottom: var(--space);
+}
+
+.dashboard label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard input,
+.dashboard select {
+  font-family: var(--font);
+  font-size: var(--text-base);
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Reduced motion for sensitivity */
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .wristband-indicator {
+    animation: none;
+  }
+}

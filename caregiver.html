@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedGuide — Caregiver Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="patient-display dashboard">
+  <main id="caregiver-app" role="main">
+    <header class="dashboard-header">
+      <h1 class="title">MedGuide Caregiver Dashboard</h1>
+      <p class="subtitle">Manage patients and medication schedules. Minimal PII — Patient IDs only.</p>
+      <nav class="dashboard-nav" aria-label="Dashboard sections">
+        <a href="#patients">Patients</a>
+        <a href="#schedules">Schedules</a>
+        <a href="#caregivers">Caregivers</a>
+        <a href="#logs">Medication logs</a>
+        <a href="index.html" target="_blank">Open patient display (new tab)</a>
+      </nav>
+    </header>
+
+    <section id="patients" class="dashboard-section">
+      <h2>Registered patients</h2>
+      <div class="card">
+        <p class="hint">Patients are identified by Patient ID only. No names or other PII are stored on the device.</p>
+        <table id="patients-table">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Wristband linked</th>
+              <th>Status</th>
+              <th>Last activity</th>
+            </tr>
+          </thead>
+          <tbody id="patients-tbody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+        <div class="form-actions">
+          <button type="button" id="btn-register-patient" class="btn btn-primary">Register new patient</button>
+        </div>
+      </div>
+      <div id="register-form" class="card hidden">
+        <h3>Register new patient</h3>
+        <div class="form-group">
+          <label for="new-patient-id">Patient ID (e.g. P-ABC123)</label>
+          <input type="text" id="new-patient-id" placeholder="P-ABC123" maxlength="12">
+        </div>
+        <div class="form-group">
+          <label for="wristband-id">Wristband device ID</label>
+          <input type="text" id="wristband-id" placeholder="WB-001">
+        </div>
+        <button type="button" id="btn-save-patient" class="btn btn-primary">Save patient</button>
+        <button type="button" id="btn-cancel-register" class="btn btn-secondary">Cancel</button>
+      </div>
+    </section>
+
+    <section id="schedules" class="dashboard-section">
+      <h2>Medication schedules</h2>
+      <div class="card">
+        <p class="hint">Assign medication times by Patient ID. The home display will show reminders at these times.</p>
+        <div class="form-group">
+          <label for="schedule-patient">Patient ID</label>
+          <select id="schedule-patient">
+            <option value="">— Select patient —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="schedule-med-name">Medication name (display only)</label>
+          <input type="text" id="schedule-med-name" placeholder="e.g. Morning medication">
+        </div>
+        <div class="form-group">
+          <label for="schedule-dosage">Dosage instructions</label>
+          <input type="text" id="schedule-dosage" placeholder="e.g. One tablet with water">
+        </div>
+        <div class="form-group">
+          <label for="schedule-time">Time</label>
+          <input type="time" id="schedule-time" value="08:00">
+        </div>
+        <button type="button" id="btn-add-schedule" class="btn btn-primary">Add to schedule</button>
+        <table id="schedules-table" class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Medication</th>
+              <th>Dosage</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="schedules-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="caregivers" class="dashboard-section">
+      <h2>Authorized caregivers</h2>
+      <div class="card">
+        <p class="hint">Caregivers who are allowed to retrieve medication for the patient. Linked by Patient ID.</p>
+        <div class="form-group">
+          <label for="caregiver-patient">Patient ID</label>
+          <select id="caregiver-patient">
+            <option value="">— Select patient —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="caregiver-name">Caregiver identifier (e.g. initials or role)</label>
+          <input type="text" id="caregiver-name" placeholder="e.g. CG-01">
+        </div>
+        <button type="button" id="btn-add-caregiver" class="btn btn-primary">Add caregiver</button>
+        <table id="caregivers-table">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Caregiver ID</th>
+            </tr>
+          </thead>
+          <tbody id="caregivers-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="logs" class="dashboard-section">
+      <h2>Medication logs &amp; missed alerts</h2>
+      <div class="card">
+        <p class="hint">Completion events from the patient display. Missed medications are flagged when a reminder was triggered but not completed.</p>
+        <div id="missed-alerts" class="missed-alerts"></div>
+        <table id="logs-table">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Medication</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="caregiver.js"></script>
+</body>
+</html>
